@@ -78,7 +78,6 @@ async def clear_command(
 ):
     chat_id = update.effective_chat.id
     try:
-        # Support both /clear 5 and /clear(5)
         raw = context.args[0].strip("()")
         amount = float(raw)
     except (IndexError, ValueError):
@@ -86,15 +85,15 @@ async def clear_command(
         return
 
     add_cleared(chat_id, amount)
-    reset_session(chat_id)   # reset session after each clear
+    reset_session(chat_id)  # resets current card and card markup to zero
 
-    rate           = get_rate(chat_id)
-    markup         = get_markup(chat_id)
-    day_total      = get_receipts_total(chat_id)
-    session_total  = get_session_total(chat_id)   # now 0 after reset
-    session_count  = get_session_count(chat_id)   # now 0 after reset
-    total_cleared  = get_total_cleared(chat_id)
-    deductions     = get_total_deductions(chat_id)
+    rate          = get_rate(chat_id)
+    markup        = get_markup(chat_id)
+    day_total     = get_receipts_total(chat_id)
+    session_total = get_session_total(chat_id)   # 0 after reset
+    session_count = get_session_count(chat_id)   # 0 after reset
+    total_cleared = get_total_cleared(chat_id)
+    deductions    = get_total_deductions(chat_id)
 
     session_markup   = calculate_markup_amount(session_total, markup)
     session_with_mkp = session_total + session_markup
@@ -117,6 +116,7 @@ async def clear_command(
         f"• Total cleared: {total_cleared:,.2f}$\n"
         f"• Remaining debt: {remaining:,.2f}$"
     )
+
 
 async def startday_command(
     update: Update,

@@ -27,23 +27,23 @@ async def amount_handler(
     chat_id = update.effective_chat.id
     text = update.message.text.strip()
 
-    rate = get_rate(chat_id)
+    rate   = get_rate(chat_id)
     markup = get_markup(chat_id)
 
     # ── +0  Show session total ────────────────────────────
     if text == "+0":
-        session_total    = get_session_total(chat_id)
-        session_count    = get_session_count(chat_id)
-        day_total        = get_receipts_total(chat_id)
-        total_cleared    = get_total_cleared(chat_id)
-        deductions       = get_total_deductions(chat_id)
+        session_total  = get_session_total(chat_id)
+        session_count  = get_session_count(chat_id)
+        day_total      = get_receipts_total(chat_id)
+        total_cleared  = get_total_cleared(chat_id)
+        deductions     = get_total_deductions(chat_id)
 
         session_markup   = calculate_markup_amount(session_total, markup)
         session_with_mkp = session_total + session_markup
-
         day_net_rub      = calculate_net_rub(day_total, markup)
         day_usdt         = calculate_usdt(day_net_rub, rate)
         day_usdt_raw     = calculate_usdt(day_total, rate)
+        card_markup      = calculate_markup_amount(session_total, markup)
         remaining        = day_usdt - deductions - total_cleared
 
         await update.message.reply_text(
@@ -55,6 +55,8 @@ async def amount_handler(
             f"\n"
             f"🗒 Day total:\n"
             f"• Received: {day_total:,.2f}₽ / {day_usdt_raw:,.2f}$\n"
+            f"• Current card: {session_total:,.2f}₽\n"
+            f"• Card markup ({markup:.0f}%): -{card_markup:,.2f}₽\n"
             f"• Total cleared: {total_cleared:,.2f}$\n"
             f"• Remaining debt: {remaining:,.2f}$"
         )
@@ -71,8 +73,9 @@ async def amount_handler(
         add_receipt(chat_id, amount)
 
         day_total      = get_receipts_total(chat_id)
+        session_total  = get_session_total(chat_id)
         markup_amount  = calculate_markup_amount(amount, markup)
-        card_markup    = calculate_markup_amount(day_total, markup)
+        card_markup    = calculate_markup_amount(session_total, markup)
         net_rub        = calculate_net_rub(day_total, markup)
         total_usdt     = calculate_usdt(net_rub, rate)
         day_usdt_raw   = calculate_usdt(day_total, rate)
@@ -88,7 +91,7 @@ async def amount_handler(
             f"\n"
             f"🗒 Day total:\n"
             f"• Received: {day_total:,.2f}₽ / {day_usdt_raw:,.2f}$\n"
-            f"• Current card: {day_total:,.2f}₽\n"
+            f"• Current card: {session_total:,.2f}₽\n"
             f"• Card markup ({markup:.0f}%): -{card_markup:,.2f}₽\n"
             f"• Total USDT: {total_usdt:,.2f}$\n"
             f"• Now: {remaining:,.2f}$"
@@ -104,7 +107,6 @@ async def amount_handler(
             return
 
         remove_receipt(chat_id, amount)
-
         day_total = get_receipts_total(chat_id)
 
         await update.message.reply_text(
