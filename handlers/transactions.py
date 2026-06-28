@@ -93,8 +93,8 @@ async def amount_handler(
             f"• Received: {day_total:,.2f}₽ / {day_usdt_raw:,.2f}$\n"
             f"• Current card: {session_total:,.2f}₽\n"
             f"• Card markup ({markup:.0f}%): -{card_markup:,.2f}₽\n"
-            f"• Total USDT: {total_usdt:,.2f}$\n"
-            f"• Now: {remaining:,.2f}$"
+            f"• Now: {total_usdt:,.2f}$\n"
+            f"• Total USDT: {remaining:,.2f}$"
         )
         return
 

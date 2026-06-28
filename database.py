@@ -1,11 +1,12 @@
 import os
-import psycopg
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 def get_connection():
-    return psycopg.connect(DATABASE_URL)
+    return psycopg2.connect(DATABASE_URL)
 
 
 def init_db():
@@ -283,6 +284,7 @@ def reset_day(chat_id):
     cursor.execute("DELETE FROM removed_receipts WHERE chat_id = %s", (chat_id,))
     cursor.execute("DELETE FROM deductions WHERE chat_id = %s", (chat_id,))
     cursor.execute("DELETE FROM session_receipts WHERE chat_id = %s", (chat_id,))
+    cursor.execute("DELETE FROM cleared WHERE chat_id = %s", (chat_id,))
     conn.commit()
     cursor.close()
     conn.close()
